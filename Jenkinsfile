@@ -4,7 +4,7 @@ pipeline {
         stage('Test') {
             steps {
                 dir('/var/jenkins_home/Katalon_Studio_Engine_Linux_64-8.2.0'){
-                    sh './katalonc -noSplash -runMode=console -projectPath="/var/jenkins_home/test/test.prj" -retry=0 -testSuiteCollectionPath="Test Suites/try to integrate test suite collection" --config -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true'
+                    sh 'docker run -t --rm -v "$(pwd)":/tmp/project katalonstudio/katalon katalonc.sh -noSplash -runMode=console -projectPath="/var/jenkins_home/test/test.prj" -retry=0 -testSuiteCollectionPath="Test Suites/try to integrate test suite collection" --config -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true'
                 }
             }
         }
