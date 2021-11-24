@@ -9,27 +9,7 @@ pipeline {
         choice(name: 'CICD', choices: ['CI', 'CICD'], description: 'pick CI / CI and CD')
         
     }
-    stages {
-        stage('Clone Code') {
-            steps{
-               script {
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'nopal',
-                                verbose: false,
-                                transfers: [
-                                    sshTransfer(
-                                        execCommand: 'git clone https://github.com/afsanarozan/cafe-frontend.git',
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                }
-            }
-        }
-
+    stages {    
         stage('Run Testing') {
             steps{
                 script {
@@ -37,81 +17,14 @@ pipeline {
                 }
             }
         }
-        
 
-        stage('Build Image') {
-            steps{
-               script {
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'nopal',
-                                verbose: false,
-                                transfers: [
-                                    sshTransfer(
-                                        remoteDirectory: "cafe-frontend",
-                                        execCommand: "cd cafe-frontend; sudo docker build -t afsanarozan/cafe-frontend:dev .",
-                                        execTimeout: 60000,
-                                    )
-                                ]
-                            )
-                        ]
-                    )
+        stage('Test') {
+            steps {
+                dir('/Users/Nopal/Downloads/ci-samples-master'){
+                    bat 'docker run -t --rm -v "$(pwd)":/tmp/project katalonstudio/katalon katalonc.sh -projectPath=/tmp/project -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest"'
                 }
             }
         }
 
-        stage('Deployment') {
-            when {
-                expression {
-                    CICD == 'CICD'
-                }
-            }
-            steps{
-               script {
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'nopal',
-                                verbose: false,
-                                transfers: [
-                                    sshTransfer(
-                                        remoteDirectory: "cafe-frontend",
-                                        execCommand: 'cd cafe-frontend; sudo docker-compose up -d',
-                                        execTimeout: 120000,
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                }
-            }
-        }
-
-        stage('Run Testing Development') {
-            when {
-                expression {
-                    CICD == 'CICD'
-                }
-            }
-            steps{
-               script {
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'nopal',
-                                verbose: false,
-                                transfers: [
-                                    sshTransfer(
-                                        execCommand: 'curl localhost:8080',
-                                        execTimeout: 120000,
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                }
-            }
-        }
     }
 }
