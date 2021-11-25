@@ -3,8 +3,8 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                dir('/var/jenkins_home/Katalon_Studio_Engine_Linux_64-8.2.0'){
-                    sh 'docker run -t --rm -v "$(pwd)":/tmp/project katalonstudio/katalon katalonc.sh -noSplash -runMode=console -projectPath="/var/jenkins_home/test/test.prj" -retry=0 -testSuiteCollectionPath="Test Suites/try to integrate test suite collection" --config -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true'
+                dir('/home/ci-samples')   {
+                    sh 'docker run -t --rm -v "$(pwd)":/tmp/project katalonstudio/katalon katalonc.sh -projectPath=/tmp/project -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest" -apiKey=872587c8-252d-460c-8c8a-a741e37303fe'
                 }
             }
         }
